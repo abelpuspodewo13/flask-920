@@ -1,0 +1,218 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Flask-MQTT example{% endblock %}
+
+{% block styles %}
+{{ super() }}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+  $(document).ready(function() {
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    $('#publish').click(function(event) {
+      var topic = $('#topic').val();
+      var message = $('#message').val();
+      var qos = $('#qos').val();
+      var data = '{"topic": "' + topic + '", "message": "' + message + '", "qos": ' + qos + '}';
+      socket.emit('publish', data=data);
+    });
+
+    $('#subscribe').click(function(event) {
+      var topic = $('#subscribe_topic').val();
+      var qos = $('#subscribe_qos').val();
+      var data = '{"topic": "' + topic + '", "qos": ' + qos + '}';
+      socket.emit('subscribe', data=data);
+      $('#subscribe').hide();
+      $('#unsubscribe').show();
+      $('#subscribe_topic').prop('readonly', true);
+    });
+
+    $('#unsubscribe').click(function(event) {
+      socket.emit('unsubscribe_all');
+      $('#subscribe').show(); 
+      $('#unsubscribe').hide();
+      $('#subscribe_topic').prop('readonly', false);
+    });
+    
+    //赤い文字のクラス
+    function NG() {
+	//let className = 'subscribe_message'+j;
+	//let textarea = document.querySelector(className);
+	let textarea = document.querySelectorAll("textarea");
+	for (let i=0;i<textarea.length;i++) {
+	  textarea[i].classList.add("test");
+	}
+	//textarea.classList.add("test");
+      
+	let temp = document.querySelectorAll(".test");
+	for (let i=0;i<temp.length;i++) {
+	  temp[i].style.color = "red";
+	  temp[i].style.fontSize = "10px";
+	}
+    };
+    
+    //緑文字のクラス
+    function OK() {
+	//let className = 'subscribe_message'+j;
+	//let textarea = document.querySelector(className);
+	let textarea = document.querySelectorAll("textarea");
+	for (let i=0;i<textarea.length;i++) {
+	  textarea[i].classList.add("test");
+	}
+	//textarea.classList.add("test");
+      
+	let temp = document.querySelectorAll(".test");
+	for (let i=0;i<temp.length;i++) {
+	  temp[i].style.color = "green";
+	  temp[i].style.fontSize = "10px";
+	}
+    };
+
+
+    socket.on('mqtt_message', function(data) {
+	console.log(data);
+	var text = '(Topic' + data['topic'] + '): ' + data['payload'];
+	for (let i=0;i<20;i++){
+	    var $textarea = $('#subscribe_messages'+i);
+	    $textarea.val(text + '\n');
+	}
+	if (String(data['payload'])=="NG"){
+	    NG();
+	} else {
+	    OK();
+	}
+     
+      const c = document.getElementByID("myCanvas");
+      const ctx = c.getContext("2d"); 
+      const ng = ctx.createLinearGradient(0,0,100,0);
+      ng.addColorStop(0, "red");
+      ng.addColorStop(1, "red");
+      ctx.fillStyle = ng;
+      ctx.fillRect(0,0,200,100);
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+<head>
+    <title>付帯設備監視システム</title>
+    <link rel="stylesheet" href='../static/style.css'/>
+    <meta http-equiv="Content-Type" content="text/html; charset=SJIS" />
+    <style>
+		body {
+			text-align: center;
+		}
+
+    </style>
+</head>
+
+<body>
+    <h1>大森帯設備全体</h1>
+    <hr>
+    <div style="width: 100%; display: table;">
+	<div style="display: table-row">
+	    <div class ="box_center" style="width: 98%; display: table-cell;"> 
+		<a href="/all">状況一覧</a>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_factory2" style="width: 98%; display: table-cell;"> 第 4　工場</div>
+	    </div>
+	</div>
+	<div style="display: table-row">
+	    <div class ="box" style="width: 49%; display: table-cell;"> 
+		<div class ="box_factory1" style="width: 98%; display: table-cell;"> 第 3　工場</div>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 6F(機械室)</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外6F</div>
+	    </div>
+	</div>
+	<div style="display: table-row">
+	    <div class ="box" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;">
+		     <a href="/dai3_5f">5F(機械室)</a>
+		</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外5F</div>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 5F</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外5F</div>
+	    </div>
+	</div>
+	<div style="display: table-row">
+	    <div class ="box" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 
+		    <a href="/dai3_4f">4F</a>
+		</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外4F✗</div>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 4F</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外4F</div>
+	    </div>
+	</div>
+	<div style="display: table-row">
+	    <div class ="box" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 3F</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 
+		<a href="/dai3_3f_out">屋外3F</a>
+		</div>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 3F</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外3F</div>
+	    </div>
+	</div>
+	<div style="display: table-row">
+	    <div class ="box" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 22%; display: table-cell;"> 
+		    <a href="/dai3_2f_neg_a">2F(負・A)</a>
+		</div>
+		<div class ="box_center" style="width: 22%; display: table-cell;"> 
+		    <a href="/dai3_2f_aa_b">2F(AA・B)</a>
+		</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;">
+		    <a href="/dai3_2f_out">屋外2F</a>
+		</div>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 2F</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外2F</div>
+	    </div>
+	</div>
+	<div style="display: table-row">
+	    <div class ="box" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 
+		    <a href="/dai3_1f">1F,M2F</a>
+		</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 
+		    <a href="/dai3_1f_out">屋外1F,オートレーター</a>
+		</div>
+	    </div>
+	    <div class ="box2" style="width: 49%; display: table-cell;"> 
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 1F</div>
+		<div class ="box_center" style="width: 46%; display: table-cell;"> 屋外1F,オートレーター</div>
+	    </div>
+	</div>
+    </div>
+ 
+    
+    <hr>
+    <h3> 最後の更新時間: {{ time }} ==> <a href="/"class="button">更新</a></h3>	
+    <hr>
+
+    <p> 株式会社　プライムアースEVエナジー</p>
+    <p>湖西ME室　企画G</p>
+    <p> @2023 Developed by Yoseph Abel</p>
+    
+
+</body>
+{% endblock %}
+
